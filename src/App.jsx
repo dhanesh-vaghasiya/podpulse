@@ -219,8 +219,8 @@ function ClusterHeader({
     <header className="sticky top-0 z-20 border-b border-[rgba(168,196,101,0.2)] bg-[#111111]/95 px-4 py-3 backdrop-blur" style={{boxShadow:'0 1px 0 rgba(168,196,101,0.08)'}}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-lg border border-[rgba(168,196,101,0.2)] bg-[rgba(168,196,101,0.2)] text-[#A8C465]">
-            <Shield size={21} />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[rgba(168,196,101,0.2)] bg-[rgba(168,196,101,0.05)] overflow-hidden">
+            <img src="/logo.png" alt="PodPulse Logo" className="h-8 w-8 object-contain" />
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
@@ -700,7 +700,7 @@ export default function App() {
       />
 
       <main className="w-full space-y-4 p-4">
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_1fr_320px] lg:h-[750px] items-stretch">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_1fr_360px] lg:h-[750px] items-stretch">
           <aside className="flex flex-col gap-3 h-full min-h-0">
             <KPICards pods={pods} />
             <div className="flex-1 min-h-0">

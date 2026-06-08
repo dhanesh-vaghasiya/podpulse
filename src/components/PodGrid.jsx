@@ -23,10 +23,10 @@ export default function PodGrid({ pods, selectedPodId, onPodClick, onOpenModal }
         </span>
       </div>
 
-      <div className="mb-3 flex flex-wrap gap-1">
+      <div className="mb-3 flex flex-wrap gap-1.5">
         {FILTERS.map((item) => {
           const active = filter === item
-          const status = item === 'all' ? 'info' : item
+          const status = item === 'all' ? 'active' : item
           const meta = getStatusMeta(status)
 
           return (
@@ -34,11 +34,14 @@ export default function PodGrid({ pods, selectedPodId, onPodClick, onOpenModal }
               key={item}
               type="button"
               onClick={() => setFilter(item)}
-              className={`rounded-md border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] transition ${
+              className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium capitalize font-sans transition-all duration-200 ${
                 active
                   ? `${meta.border} ${meta.bg} ${meta.text}`
-                  : 'border-[rgba(168,196,101,0.2)] bg-transparent text-[#555555] hover:border-[rgba(168,196,101,0.4)] hover:text-[#888888]'
+                  : 'border-[rgba(168,196,101,0.12)] bg-transparent text-[#555555] hover:border-[rgba(168,196,101,0.3)] hover:text-[#dad7cd]'
               }`}
+              style={{
+                boxShadow: active ? `0 0 8px ${meta.line}25` : undefined
+              }}
             >
               {item}
             </button>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { RefreshCcw, Search, X } from 'lucide-react'
 import { StatusDot } from './status'
+import { getStatusMeta } from './statusMeta'
 
 const NAMESPACE_COLORS = {
   academic: 'border-[rgba(122,158,151,0.3)] bg-[rgba(122,158,151,0.15)] text-[#7A9E97]',
@@ -129,28 +130,32 @@ export default function PodDetailsModal({
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex rounded-md border border-[rgba(168,196,101,0.2)] bg-[rgba(255,255,255,0.05)] p-1">
+            <div className="flex rounded-full border border-[rgba(168,196,101,0.15)] bg-[rgba(255,255,255,0.03)] p-0.5 items-center">
               {['all', 'critical', 'warning', 'healthy'].map((f) => {
                 const isActive = filter === f
-                let activeStyle = 'bg-[rgba(168,196,101,0.2)] border-[rgba(168,196,101,0.4)] text-[#A8C465]'
-                if (f === 'critical' && isActive) activeStyle = 'bg-[rgba(220,38,38,0.12)] border-[rgba(220,38,38,0.35)] text-[#DC2626]'
-                if (f === 'warning' && isActive) activeStyle = 'bg-[rgba(217,119,6,0.12)] border-[rgba(217,119,6,0.35)] text-[#D97706]'
-                if (f === 'healthy' && isActive) activeStyle = 'bg-[rgba(22,163,74,0.15)] border-[rgba(34,197,94,0.35)] text-[#22c55e]'
+                const status = f === 'all' ? 'active' : f
+                const meta = getStatusMeta(status)
 
                 return (
                   <button
                     key={f}
                     onClick={() => setFilter(f)}
-                    className={`rounded border px-3 py-1 text-xs font-medium capitalize transition ${
-                      isActive ? activeStyle : 'border-transparent text-[#555555] hover:text-[#dad7cd]'
+                    className={`rounded-full px-3 py-1 text-[11px] font-medium capitalize font-sans transition-all duration-200 ${
+                      isActive
+                        ? `${meta.bg} ${meta.text}`
+                        : 'text-[#555555] hover:text-[#dad7cd]'
                     }`}
+                    style={{
+                      boxShadow: isActive ? `0 0 6px ${meta.line}1a` : undefined,
+                      border: isActive ? `1px solid ${meta.line}50` : '1px solid transparent'
+                    }}
                   >
                     {f}
                   </button>
                 )
               })}
-              <div className="mx-1 w-px bg-[rgba(168,196,101,0.2)]" />
-              <button disabled className="px-2 py-1 text-xs font-medium text-[#555555] cursor-not-allowed">
+              <div className="mx-1 w-px h-4 bg-[rgba(168,196,101,0.15)]" />
+              <button disabled className="px-3 py-1 text-[11px] font-medium font-sans text-[#555555] cursor-not-allowed">
                 by Namespace ▾
               </button>
             </div>
