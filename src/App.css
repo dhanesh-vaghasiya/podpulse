@@ -148,3 +148,16 @@
     opacity: 1;
   }
 }
+
+@keyframes row-highlight-yellow {
+  0% {
+    background-color: rgba(255, 170, 0, 0.2);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.row-highlight-anim {
+  animation: row-highlight-yellow 1.5s ease-out;
+}

@@ -5,6 +5,7 @@ import AIInsightCard from './components/AIInsightCard'
 import DependencyGraph from './components/DependencyGraph'
 import KPICards from './components/KPICards'
 import LiveEventLog from './components/LiveEventLog'
+import PodDetailsModal from './components/PodDetailsModal'
 import PodGrid from './components/PodGrid'
 import ResourceCharts from './components/ResourceCharts'
 import { StatusBadge, StatusDot } from './components/status'
@@ -359,6 +360,11 @@ export default function App() {
   const [eventLog, setEventLog] = useState(createInitialEventLog)
   const [clockNow, setClockNow] = useState(() => new Date())
   const [lastScanAge, setLastScanAge] = useState(0)
+  
+  const [isPodModalOpen, setIsPodModalOpen] = useState(false)
+  const [modalScrollPodId, setModalScrollPodId] = useState(null)
+  const [modalHighlightPodId, setModalHighlightPodId] = useState(null)
+
   const timersRef = useRef([])
   const scanCycleRef = useRef(841)
 
@@ -471,6 +477,23 @@ export default function App() {
   function handleSelectPod(podId) {
     const insight = getInsightForPod(podId)
     highlightPodAndInsight(podId, insight?.id)
+  }
+
+  function handlePodGridClick(podId) {
+    const pod = podsById.get(podId)
+    setIsPodModalOpen(true)
+    setModalScrollPodId(podId)
+    if (pod?.status === 'critical' || pod?.status === 'warning') {
+      setModalHighlightPodId(podId)
+      schedule(() => setModalHighlightPodId(null), 1600)
+    } else {
+      setModalHighlightPodId(null)
+    }
+  }
+
+  function handleViewInsightFromModal(podId) {
+    setIsPodModalOpen(false)
+    handleSelectPod(podId)
   }
 
   function injectMemoryLeak() {
@@ -648,7 +671,16 @@ export default function App() {
       <main className="grid min-h-[calc(100vh-65px)] grid-cols-1 gap-3 p-3 lg:grid-cols-[250px_minmax(0,1fr)_320px]">
         <aside className="min-h-0 space-y-3">
           <KPICards pods={pods} />
-          <PodGrid pods={pods} selectedPodId={selectedPodId} onSelectPod={handleSelectPod} />
+          <PodGrid 
+            pods={pods} 
+            selectedPodId={selectedPodId} 
+            onPodClick={handlePodGridClick} 
+            onOpenModal={() => {
+              setModalScrollPodId(null)
+              setModalHighlightPodId(null)
+              setIsPodModalOpen(true)
+            }}
+          />
         </aside>
 
         <section className="min-w-0 space-y-3">
@@ -690,6 +722,16 @@ export default function App() {
       <footer className="border-t border-white/10 px-4 py-4 text-center text-xs text-slate-600">
         Demo Cluster: smart-campus • v1.28.4 • minikube-node-1
       </footer>
+
+      <PodDetailsModal
+        isOpen={isPodModalOpen}
+        onClose={() => setIsPodModalOpen(false)}
+        pods={pods}
+        insights={insights}
+        onViewInsight={handleViewInsightFromModal}
+        scrollPodId={modalScrollPodId}
+        highlightPodId={modalHighlightPodId}
+      />
     </div>
   )
 }

@@ -4,30 +4,9 @@ import { getStatusMeta } from './statusMeta'
 
 const FILTERS = ['all', 'critical', 'warning', 'healthy']
 
-function metricTone(value) {
-  if (value >= 85) return '#ff4444'
-  if (value >= 70) return '#ffaa00'
-  return '#00ff88'
-}
 
-function MiniMetric({ label, value }) {
-  return (
-    <div className="flex min-w-0 items-center gap-[2px]">
-      <span className="text-[8px] font-semibold uppercase text-slate-500">
-        {label}
-      </span>
-      <span className="h-1 w-4 overflow-hidden rounded-full bg-white/[0.08] sm:w-5">
-        <span
-          className="block h-full rounded-full transition-all duration-300"
-          style={{ width: `${Math.min(value, 100)}%`, backgroundColor: metricTone(value) }}
-        />
-      </span>
-      <span className="w-4 text-right text-[8px] tabular-nums text-slate-400">{value}%</span>
-    </div>
-  )
-}
 
-export default function PodGrid({ pods, selectedPodId, onSelectPod }) {
+export default function PodGrid({ pods, selectedPodId, onPodClick, onOpenModal }) {
   const [filter, setFilter] = useState('all')
   const visiblePods = useMemo(
     () => (filter === 'all' ? pods : pods.filter((pod) => pod.status === filter)),
@@ -73,38 +52,44 @@ export default function PodGrid({ pods, selectedPodId, onSelectPod }) {
         {visiblePods.map((pod) => {
           const meta = getStatusMeta(pod.status)
           const selected = pod.id === selectedPodId
+          const statusColor = pod.status === 'critical' ? '#ff4444' : pod.status === 'warning' ? '#ffaa00' : '#00ff88'
 
           return (
             <button
               key={pod.id}
               type="button"
-              onClick={() => onSelectPod(pod.id)}
+              onClick={() => onPodClick(pod.id)}
               title={`${pod.id}\nNamespace: ${pod.namespace}\nRestarts: ${pod.restarts}\nAge: ${pod.age}`}
-              className={`pod-tile h-[60px] rounded-md border border-white/[0.06] bg-white/[0.045] px-2 py-2 text-left transition duration-300 hover:border-white/[0.18] hover:bg-white/[0.07] ${
+              className={`relative flex h-[42px] items-center gap-1.5 overflow-hidden rounded-md bg-[#1a1d27] p-[6px] text-left transition duration-300 hover:bg-white/[0.07] ${
                 selected ? 'ring-2 ring-[#4488ff]/70' : ''
-              } ${pod.status === 'warning' ? 'shadow-[0_0_18px_rgba(255,170,0,0.12)]' : ''}`}
-              style={{ borderLeft: `3px solid ${meta.line}` }}
+              }`}
+              style={{ borderLeft: `2px solid ${meta.line}` }}
             >
-              <div className="flex min-w-0 items-center gap-1.5">
-                <StatusDot
-                  status={pod.status}
-                  className={`h-2 w-2 ${pod.status === 'critical' ? 'pod-dot-critical' : ''}`}
-                />
-                <span className="min-w-0 flex-1 truncate text-[11px] font-bold leading-none text-slate-100">
-                  {pod.name}
-                </span>
-                <span className="max-w-[58px] truncate rounded-full border border-[#4488ff]/20 bg-[#4488ff]/10 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-[0.08em] text-[#8fb2ff]">
-                  {pod.namespace}
-                </span>
-              </div>
-              <div className="mt-2 flex min-w-0 items-center justify-between gap-1">
-                <MiniMetric label="CPU" value={pod.cpu} />
-                <MiniMetric label="MEM" value={pod.memory} />
-              </div>
+              <StatusDot
+                status={pod.status}
+                className={`h-2 w-2 shrink-0 ${pod.status === 'critical' ? 'pod-dot-critical' : ''}`}
+              />
+              <span className="min-w-0 flex-1 truncate text-[11px] font-bold leading-none text-slate-100" title={pod.name}>
+                {pod.name.length > 10 ? `${pod.name.substring(0, 10)}…` : pod.name}
+              </span>
+              
+              {/* Thin colored bar at bottom */}
+              <div 
+                className="absolute bottom-0 left-0 right-0 h-[4px]"
+                style={{ backgroundColor: statusColor }}
+              />
             </button>
           )
         })}
       </div>
+
+      <button
+        type="button"
+        onClick={onOpenModal}
+        className="mt-3 w-full rounded-md border border-white/10 bg-transparent py-2 text-[12px] font-medium text-slate-400 transition hover:border-white/20 hover:text-slate-200"
+      >
+        View All Pods →
+      </button>
     </section>
   )
 }
